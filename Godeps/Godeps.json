@@ -34,10 +34,6 @@
 			"Rev": "792786c7400a136282c1664665ae0a8db921c6c2"
 		},
 		{
-			"ImportPath": "github.com/streamrail/concurrent-map",
-			"Rev": "8bf1e9bacbf65b10c81d0f4314cf2b1ebef728b5"
-		},
-		{
 			"ImportPath": "github.com/stretchr/testify/assert",
 			"Comment": "v1.1.4-4-g976c720",
 			"Rev": "976c720a22c8eb4eb6a0b4348ad85ad12491a506"
