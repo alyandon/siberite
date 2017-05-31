@@ -13,23 +13,23 @@ func Test_Controller_parseGetCommand(t *testing.T) {
 		"work/close":                      Command{SubCommand: "close"},
 		"work/abort":                      Command{SubCommand: "abort"},
 		"work/peek":                       Command{SubCommand: "peek"},
-		"work/t=10":                       Command{},
-		"work/t=10/t=100/t=22":            Command{},
-		"work/t=10/open":                  Command{SubCommand: "open"},
-		"work/open/t=10":                  Command{SubCommand: "open"},
-		"work/close/open/t=10":            Command{SubCommand: "close/open"},
-		"work/close/t=10/open/abort":      Command{SubCommand: "close/open/abort"},
+		"work/t=10":                       Command{Timeout: 10},
+		"work/t=10/t=100/t=22":            Command{Timeout: 10},
+		"work/t=10/open":                  Command{SubCommand: "open", Timeout: 10},
+		"work/open/t=10":                  Command{SubCommand: "open", Timeout: 10},
+		"work/close/open/t=10":            Command{SubCommand: "close/open", Timeout: 10},
+		"work/close/t=10/open/abort":      Command{SubCommand: "close/open/abort", Timeout: 10},
 		"work.cg":                         Command{ConsumerGroup: "cg"},
 		"work.consumer/open":              Command{SubCommand: "open", ConsumerGroup: "consumer"},
 		"work.1/close":                    Command{SubCommand: "close", ConsumerGroup: "1"},
 		"work.000/abort":                  Command{SubCommand: "abort", ConsumerGroup: "000"},
 		"work.1:2/peek":                   Command{SubCommand: "peek", ConsumerGroup: "1:2"},
-		"work.consumergroup/t=10":         Command{ConsumerGroup: "consumergroup"},
-		"work.test.cg/t=10/t=100/t=22":    Command{ConsumerGroup: "test"},
-		"work.1cg/t=10/open":              Command{SubCommand: "open", ConsumerGroup: "1cg"},
-		"work.c/open/t=10":                Command{SubCommand: "open", ConsumerGroup: "c"},
-		"work.0/close/open/t=10":          Command{SubCommand: "close/open", ConsumerGroup: "0"},
-		"work.group/close/t=1/open/abort": Command{SubCommand: "close/open/abort", ConsumerGroup: "group"},
+		"work.consumergroup/t=10":         Command{ConsumerGroup: "consumergroup", Timeout: 10},
+		"work.test.cg/t=10/t=100/t=22":    Command{ConsumerGroup: "test", Timeout: 10},
+		"work.1cg/t=10/open":              Command{SubCommand: "open", ConsumerGroup: "1cg", Timeout: 10},
+		"work.c/open/t=10":                Command{SubCommand: "open", ConsumerGroup: "c", Timeout: 10},
+		"work.0/close/open/t=10":          Command{SubCommand: "close/open", ConsumerGroup: "0", Timeout: 10},
+		"work.group/close/t=1/open/abort": Command{SubCommand: "close/open/abort", ConsumerGroup: "group", Timeout: 1},
 	}
 
 	for input, command := range testCases {
@@ -38,6 +38,7 @@ func Test_Controller_parseGetCommand(t *testing.T) {
 		assert.Equal(t, "work", cmd.QueueName, input)
 		assert.Equal(t, command.SubCommand, cmd.SubCommand, input)
 		assert.Equal(t, command.ConsumerGroup, cmd.ConsumerGroup, input)
+		assert.Equal(t, command.Timeout, cmd.Timeout, input)
 	}
 }
 
