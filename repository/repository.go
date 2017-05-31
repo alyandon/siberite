@@ -8,9 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/orcaman/concurrent-map"
-
 	"github.com/bogdanovich/siberite/cgroup"
+	"github.com/orcaman/concurrent-map"
 )
 
 // Version represents siberite version
@@ -60,6 +59,14 @@ func (repo *QueueRepository) GetQueue(key string) (*cgroup.CGQueue, error) {
 
 	repo.Lock()
 	defer repo.Unlock()
+
+	// now that we have acquired the lock, recheck to see if someone else
+	// already managed to create the queue while we were waiting on the lock
+	if q, ok := repo.get(key); ok {
+		return q, nil
+	}
+
+	// ok, we are the first - create the queue
 	q, err := cgroup.CGQueueOpen(key, repo.DataPath)
 	if err != nil {
 		return nil, err
