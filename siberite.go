@@ -20,11 +20,12 @@ var (
 	hostAndPort = flag.String("listen", "0.0.0.0:22133", "ip and port to listen")
 	pidPath     = flag.String("pid", "", "path to PID file to use")
 	versionFlag = flag.Bool("version", false, "prints current version")
+	maxProcs    = flag.Int("maxprocs", runtime.NumCPU(), "runtime go maxprocs setting")
 )
 
 func main() {
 	flag.Parse()
-	runtime.GOMAXPROCS(runtime.NumCPU())
+	runtime.GOMAXPROCS(*maxProcs)
 
 	service := service.New(*dataDir)
 

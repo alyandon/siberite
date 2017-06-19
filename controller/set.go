@@ -16,17 +16,20 @@ import (
 func (c *Controller) Set(input []string) error {
 	cmd, err := parseSetCommand(input)
 	if err != nil {
+		log.Printf("parseSetCommand error %v", err)
 		return err
 	}
 
 	dataBlock, err := c.readDataBlock(cmd.DataSize)
 	if err != nil {
+		log.Printf("readDataBlock error %v", err)
 		return err
 	}
 
 	if cmd.FanoutQueues == nil {
 		err = c.storeDataBlock(cmd.QueueName, dataBlock)
 		if err != nil {
+			log.Printf("storeDataBlock1 error %v", err)
 			log.Println(cmd, err)
 			return err
 		}
@@ -34,6 +37,7 @@ func (c *Controller) Set(input []string) error {
 		for _, queueName := range cmd.FanoutQueues {
 			err = c.storeDataBlock(queueName, dataBlock)
 			if err != nil {
+				log.Printf("storeDataBlock2 error %v", err)
 				log.Println(cmd, err)
 				return err
 			}
@@ -57,6 +61,7 @@ func (c *Controller) readDataBlock(totalBytes int) ([]byte, error) {
 
 	_, err := io.ReadFull(c.rw.Reader, c.dataBuffer)
 	if err != nil {
+		log.Printf("ReadFull error %v", err)
 		return nil, err
 	}
 
@@ -70,6 +75,7 @@ func (c *Controller) readDataBlock(totalBytes int) ([]byte, error) {
 func (c *Controller) storeDataBlock(queueName string, dataBlock []byte) error {
 	q, err := c.repo.GetQueue(queueName)
 	if err != nil {
+		log.Printf("GetQueue error %v", err)
 		return err
 	}
 	return q.Enqueue([]byte(dataBlock))

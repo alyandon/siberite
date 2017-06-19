@@ -147,14 +147,13 @@ func parseGetCommand(input []string) *Command {
 		cmd.Timeout, _ = strconv.Atoi(fields[2])
 		input[1] = timeoutRegexp.ReplaceAllString(input[1], "")
 	}
-	tokens := make([]string, 3)
 	if strings.Contains(input[1], "/") {
-		tokens = strings.SplitN(input[1], "/", 2)
+		tokens := strings.SplitN(input[1], "/", 2)
 		cmd.QueueName = tokens[0]
 		cmd.SubCommand = strings.Trim(tokens[1], "/")
 	}
 	if strings.Contains(cmd.QueueName, cgSeparator) {
-		tokens = strings.SplitN(cmd.QueueName, cgSeparator, 3)
+		tokens := strings.SplitN(cmd.QueueName, cgSeparator, 3)
 		cmd.QueueName = tokens[0]
 		cmd.ConsumerGroup = tokens[1]
 	}

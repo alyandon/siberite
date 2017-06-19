@@ -134,9 +134,8 @@ func (c *Controller) getConsumer(cmd *Command) (queue.Consumer, error) {
 
 func parseCommand(input []string) *Command {
 	cmd := &Command{Name: input[0], QueueName: input[1], SubCommand: ""}
-	tokens := make([]string, 3)
 	if strings.Contains(cmd.QueueName, cgSeparator) {
-		tokens = strings.SplitN(cmd.QueueName, cgSeparator, 3)
+		tokens := strings.SplitN(cmd.QueueName, cgSeparator, 3)
 		cmd.QueueName = tokens[0]
 		cmd.ConsumerGroup = tokens[1]
 	}

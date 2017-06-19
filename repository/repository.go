@@ -69,6 +69,7 @@ func (repo *QueueRepository) GetQueue(key string) (*cgroup.CGQueue, error) {
 	// ok, we are the first - create the queue
 	q, err := cgroup.CGQueueOpen(key, repo.DataPath)
 	if err != nil {
+		log.Printf("CGQueueOpen error %v", err)
 		return nil, err
 	}
 	repo.storage.Set(key, q)

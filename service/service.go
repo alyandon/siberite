@@ -77,9 +77,11 @@ func (s *Service) Stop() {
 }
 
 func (s *Service) handleConnection(conn *net.TCPConn) {
+	log.Println("Handling connection")
 	defer conn.Close()
 	defer s.wg.Done()
 
+	log.Println("Creating controller session")
 	c := controller.NewSession(conn, s.repo)
 	defer c.FinishSession()
 
@@ -95,6 +97,7 @@ func (s *Service) handleConnection(conn *net.TCPConn) {
 			continue
 		}
 		if err != nil {
+			log.Printf("error dispatching %v", err)
 			if err == controller.ErrClientQuit || err.Error() == "EOF" {
 				return
 			}

@@ -1,6 +1,7 @@
 package cgroup
 
 import (
+	"log"
 	"os"
 	"sync"
 
@@ -54,9 +55,13 @@ func (q *CGQueue) initialize() error {
 	var err error
 	q.Queue, err = queue.Open(q.Name, q.dataDir, &queue.Options{})
 	if err != nil {
+		log.Println("initialize queue open error")
 		return err
 	}
 
 	q.CGManager, err = NewCGManager(q.dataDir+"/_.metadata", q.Queue)
+	if err != nil {
+		log.Println("NewCGManager error")
+	}
 	return err
 }

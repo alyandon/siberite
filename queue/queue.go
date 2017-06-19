@@ -3,6 +3,7 @@ package queue
 import (
 	"encoding/binary"
 	"errors"
+	"log"
 	"os"
 	"regexp"
 	"sync"
@@ -62,6 +63,8 @@ type Queue struct {
 	opts     *Options
 	head     uint64
 	tail     uint64
+	openhead uint64
+	opentail uint64
 	isOpened bool
 	isShared bool
 }
@@ -88,6 +91,8 @@ func Open(name string, dataDir string, opts *Options) (*Queue, error) {
 		opts:     opts,
 		head:     0,
 		tail:     0,
+		openhead: 1099511627776, // 2**40
+		opentail: 1099511627776,
 		isOpened: false,
 		isShared: false,
 	}
@@ -105,6 +110,8 @@ func OpenShared(name string, keyPrefix string, db *leveldb.DB) (*Queue, error) {
 		opts:     &Options{KeyPrefix: []byte(keyPrefix)},
 		head:     0,
 		tail:     0,
+		openhead: 1099511627776, // 2**40
+		opentail: 1099511627776,
 		isOpened: false,
 		isShared: true,
 	}
@@ -144,6 +151,24 @@ func (q *Queue) Head() uint64 { return q.head }
 
 // Tail returns current tail offset of the queue
 func (q *Queue) Tail() uint64 { return q.tail }
+
+// OpenHead returns current head offset of the open item queue
+func (q *Queue) OpenHead() uint64 { return q.openhead }
+
+// OpenTail returns current tail offset of the open item queue
+func (q *Queue) OpenTail() uint64 { return q.opentail }
+
+// EnqueueOpen adds new value to the open queue
+func (q *Queue) EnqueueOpen(value []byte) error {
+	q.Lock()
+	defer q.Unlock()
+
+	err := q.db.Put(q.dbKey(q.opentail+1), value, nil)
+	if err == nil {
+		q.opentail++
+	}
+	return err
+}
 
 // Length returns current length of the queue
 func (q *Queue) Length() uint64 {
@@ -285,6 +310,7 @@ func (q *Queue) open() error {
 			&opt.Options{OpenFilesCacheCapacity: levelDBOpenFilesCacheCapacity},
 		)
 		if err != nil {
+			log.Printf("leveldb.OpenFile error %v", err)
 			return err
 		}
 	}

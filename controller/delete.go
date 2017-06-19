@@ -3,6 +3,8 @@ package controller
 import (
 	"fmt"
 	"log"
+
+	"github.com/bogdanovich/siberite/cgroup"
 )
 
 // Delete handles DELETE command
@@ -13,8 +15,9 @@ func (c *Controller) Delete(input []string) error {
 	cmd := parseCommand(input)
 
 	var err error
+	var q *cgroup.CGQueue
 	if cmd.ConsumerGroup != "" {
-		q, err := c.repo.GetQueue(cmd.QueueName)
+		q, err = c.repo.GetQueue(cmd.QueueName)
 		if err != nil {
 			return NewError(commonError, err)
 		}
@@ -25,7 +28,7 @@ func (c *Controller) Delete(input []string) error {
 	}
 
 	if err != nil {
-		log.Printf("Command %s: %s ", cmd, err.Error())
+		log.Printf("Command %s: %s ", cmd.Name, err.Error())
 		return NewError(commonError, err)
 	}
 	fmt.Fprint(c.rw.Writer, endMessage)
